@@ -2,7 +2,7 @@
 use std::fs;
 
 #[allow(dead_code)]
-fn day_1() {
+pub fn day_1() {
     let file_contents = fs::read_to_string("day1_puzzle.txt").expect("Unable to read file");
     let file_lines = file_contents.split("\n").collect::<Vec<&str>>();
     let mut elf_food = vec![Vec::new()];

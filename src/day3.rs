@@ -20,6 +20,7 @@ fn find_solution(inputs: &Vec<Vec<&str>>) -> Vec<i32> {
     scores.into_iter().map(|x| x as i32).collect()
 }
 
+#[allow(dead_code)]
 pub fn day_3() {
     let file_contents = fs::read_to_string("day3_puzzle.txt").expect("Unable to read file");
     let file_lines = file_contents.split("\n").filter(|line| !line.is_empty()).collect::<Vec<&str>>();
