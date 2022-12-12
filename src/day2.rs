@@ -12,7 +12,7 @@ impl RockPaperScissors {
         match self {
             RockPaperScissors::Rock => RockPaperScissors::Scissors,
             RockPaperScissors::Paper => RockPaperScissors::Rock,
-            RockPaperScissors::Scissors => RockPaperScissors::Paper
+            RockPaperScissors::Scissors => RockPaperScissors::Paper,
         }
     }
 
@@ -24,7 +24,7 @@ impl RockPaperScissors {
         match self {
             RockPaperScissors::Rock => RockPaperScissors::Paper,
             RockPaperScissors::Paper => RockPaperScissors::Scissors,
-            RockPaperScissors::Scissors => RockPaperScissors::Rock
+            RockPaperScissors::Scissors => RockPaperScissors::Rock,
         }
     }
 }
@@ -33,7 +33,8 @@ impl RockPaperScissors {
 pub fn day_2() {
     let file_contents = fs::read_to_string("day2_puzzle.txt").expect("Unable to read file");
     let file_lines = file_contents.split("\n").collect::<Vec<&str>>();
-    let game_rounds_1 = file_lines.iter()
+    let game_rounds_1 = file_lines
+        .iter()
         .filter(|&&line| !line.is_empty())
         .map(|&line| {
             let a = line.chars().nth(0).expect(line);
@@ -42,17 +43,19 @@ pub fn day_2() {
                 'A' => RockPaperScissors::Rock,
                 'B' => RockPaperScissors::Paper,
                 'C' => RockPaperScissors::Scissors,
-                _ => panic!()
+                _ => panic!(),
             };
             let my_sign = match b {
                 'X' => RockPaperScissors::Rock,
                 'Y' => RockPaperScissors::Paper,
                 'Z' => RockPaperScissors::Scissors,
-                _ => panic!()
+                _ => panic!(),
             };
             (my_sign, opp_sign)
-        }).collect::<Vec<_>>();
-    let game_rounds_2 = file_lines.iter()
+        })
+        .collect::<Vec<_>>();
+    let game_rounds_2 = file_lines
+        .iter()
         .filter(|&&line| !line.is_empty())
         .map(|&line| {
             let a = line.chars().nth(0).expect(line);
@@ -61,16 +64,17 @@ pub fn day_2() {
                 'A' => RockPaperScissors::Rock,
                 'B' => RockPaperScissors::Paper,
                 'C' => RockPaperScissors::Scissors,
-                _ => panic!()
+                _ => panic!(),
             };
             let my_sign = match b {
                 'X' => opp_sign.wins_against(),
                 'Y' => opp_sign.draws_against(),
                 'Z' => opp_sign.loses_against(),
-                _ => panic!()
+                _ => panic!(),
             };
             (my_sign, opp_sign)
-        }).collect::<Vec<_>>();
+        })
+        .collect::<Vec<_>>();
 
     fn round_score(me: &RockPaperScissors, opp: &RockPaperScissors) -> i32 {
         match (me, opp) {
@@ -86,8 +90,14 @@ pub fn day_2() {
         }
     }
 
-    let scores_1 = game_rounds_1.iter().map(|(a, b)| round_score(a, b)).collect::<Vec<_>>();
-    let scores_2 = game_rounds_2.iter().map(|(a, b)| round_score(a, b)).collect::<Vec<_>>();
+    let scores_1 = game_rounds_1
+        .iter()
+        .map(|(a, b)| round_score(a, b))
+        .collect::<Vec<_>>();
+    let scores_2 = game_rounds_2
+        .iter()
+        .map(|(a, b)| round_score(a, b))
+        .collect::<Vec<_>>();
 
     println!("{:?}", scores_1.iter().sum::<i32>());
     println!("{:?}", scores_2.iter().sum::<i32>());

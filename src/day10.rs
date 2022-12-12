@@ -1,7 +1,6 @@
-use std::fs;
 use itertools::Itertools;
 use num::abs;
-
+use std::fs;
 
 #[derive(Debug, Clone)]
 enum Operation {
@@ -11,14 +10,17 @@ enum Operation {
 
 fn read_input() -> Vec<Operation> {
     let file_contents = fs::read_to_string("day10_puzzle.txt").expect("Unable to read file");
-    file_contents.split("\n").map(|line| {
-        if line == "noop" {
-            Operation::Noop
-        } else {
-            let x = line.split_once(" ").unwrap().1.parse().unwrap();
-            Operation::Addx(x)
-        }
-    }).collect_vec()
+    file_contents
+        .split("\n")
+        .map(|line| {
+            if line == "noop" {
+                Operation::Noop
+            } else {
+                let x = line.split_once(" ").unwrap().1.parse().unwrap();
+                Operation::Addx(x)
+            }
+        })
+        .collect_vec()
 }
 
 #[allow(dead_code)]
@@ -28,11 +30,9 @@ pub fn day_10() {
     let register_values_by_cycle = {
         let cycle_additions = op_list
             .iter()
-            .flat_map(|operation| {
-                match operation {
-                    Operation::Noop => vec![0],
-                    Operation::Addx(x) => vec![0, *x]
-                }
+            .flat_map(|operation| match operation {
+                Operation::Noop => vec![0],
+                Operation::Addx(x) => vec![0, *x],
             })
             .collect_vec();
         let mut cycle_additions_cumsum = cycle_additions

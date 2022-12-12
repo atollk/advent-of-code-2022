@@ -1,6 +1,6 @@
-use std::fs;
-use itertools::Itertools;
 use iterslide::SlideIterator;
+use itertools::Itertools;
+use std::fs;
 
 fn get_marker_position(file_contents: &str, window_size: usize) -> Option<usize> {
     for (i, window) in file_contents.chars().slide(window_size).enumerate() {

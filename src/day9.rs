@@ -1,7 +1,6 @@
+use itertools::Itertools;
 use std::collections::HashSet;
 use std::{fs, iter};
-use itertools::Itertools;
-
 
 #[derive(Debug, Clone)]
 enum Direction {
@@ -26,10 +25,13 @@ impl Direction {
 
 fn read_input() -> Vec<Direction> {
     let file_contents = fs::read_to_string("day9_puzzle.txt").expect("Unable to read file");
-    file_contents.split("\n").flat_map(|line| {
-        let (a, b) = line.split_once(" ").unwrap();
-        iter::repeat(Direction::from_string(a).unwrap()).take(b.parse().unwrap())
-    }).collect_vec()
+    file_contents
+        .split("\n")
+        .flat_map(|line| {
+            let (a, b) = line.split_once(" ").unwrap();
+            iter::repeat(Direction::from_string(a).unwrap()).take(b.parse().unwrap())
+        })
+        .collect_vec()
 }
 
 #[derive(Debug, Clone)]
@@ -81,20 +83,31 @@ impl RopeState {
         }
 
         // Record tail position.
-        self.visited_tail_positions.insert(*self.knots.last().unwrap());
+        self.visited_tail_positions
+            .insert(*self.knots.last().unwrap());
     }
 
     #[allow(dead_code)]
     fn pretty_print(&self) {
-        let x_positions = self.visited_tail_positions.iter().map(|p| p.0).chain(self.knots.iter().map(|knot| knot.0));
-        let y_positions = self.visited_tail_positions.iter().map(|p| p.1).chain(self.knots.iter().map(|knot| knot.1));
+        let x_positions = self
+            .visited_tail_positions
+            .iter()
+            .map(|p| p.0)
+            .chain(self.knots.iter().map(|knot| knot.0));
+        let y_positions = self
+            .visited_tail_positions
+            .iter()
+            .map(|p| p.1)
+            .chain(self.knots.iter().map(|knot| knot.1));
         let min_x = x_positions.clone().min().unwrap();
         let max_x = x_positions.clone().max().unwrap();
         let min_y = y_positions.clone().min().unwrap();
         let max_y = y_positions.clone().max().unwrap();
         for y in (min_y..=max_y).rev() {
             for x in min_x..=max_x {
-                let c = if let Some((knot_i, _)) = self.knots.iter().find_position(|knot| **knot == (x, y)) {
+                let c = if let Some((knot_i, _)) =
+                    self.knots.iter().find_position(|knot| **knot == (x, y))
+                {
                     knot_i.to_string()
                 } else {
                     if (0, 0) == (x, y) {
@@ -103,7 +116,8 @@ impl RopeState {
                         "#"
                     } else {
                         "."
-                    }.to_string()
+                    }
+                    .to_string()
                 };
                 print!("{}", c);
             }

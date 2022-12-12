@@ -1,7 +1,6 @@
+use itertools::Itertools;
 use std::collections::VecDeque;
 use std::fmt::{Debug, Formatter};
-use itertools::Itertools;
-
 
 #[derive(Debug, Clone)]
 struct Day11State<'a> {
@@ -27,7 +26,8 @@ impl<'a> Day11State<'a> {
                 let mut item = self.monkey_programs[i].items.pop_front().unwrap();
                 item = (self.monkey_programs[i].operation)(item);
                 item /= 3;
-                let next_monkey = if (item % self.monkey_programs[i].test_divisble_by as u128) == 0 {
+                let next_monkey = if (item % self.monkey_programs[i].test_divisble_by as u128) == 0
+                {
                     self.monkey_programs[i].true_test_target
                 } else {
                     self.monkey_programs[i].false_test_target
@@ -38,7 +38,11 @@ impl<'a> Day11State<'a> {
     }
 
     fn perform_round_unlimited(&mut self) {
-        let div_test_product = self.monkey_programs.iter().map(|mp| mp.test_divisble_by).product::<u32>() as u128;
+        let div_test_product = self
+            .monkey_programs
+            .iter()
+            .map(|mp| mp.test_divisble_by)
+            .product::<u32>() as u128;
         for i in 0..self.monkey_programs.len() {
             let item_count = self.monkey_programs[i].items.len();
             for _ in 0..item_count {
@@ -46,7 +50,8 @@ impl<'a> Day11State<'a> {
                 let mut item = self.monkey_programs[i].items.pop_front().unwrap();
                 item = (self.monkey_programs[i].operation)(item);
                 item %= div_test_product;
-                let next_monkey = if (item % self.monkey_programs[i].test_divisble_by as u128) == 0 {
+                let next_monkey = if (item % self.monkey_programs[i].test_divisble_by as u128) == 0
+                {
                     self.monkey_programs[i].true_test_target
                 } else {
                     self.monkey_programs[i].false_test_target
@@ -59,7 +64,11 @@ impl<'a> Day11State<'a> {
 
 impl<'a> Debug for MonkeyProgram<'a> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "MonkeyProgram {{ items: {:?}, inspect_count: {} }}", self.items, self.inspect_count)
+        write!(
+            f,
+            "MonkeyProgram {{ items: {:?}, inspect_count: {} }}",
+            self.items, self.inspect_count
+        )
     }
 }
 
@@ -130,7 +139,7 @@ fn puzzle_input() -> Day11State<'static> {
                 false_test_target: 1,
                 inspect_count: 0,
             },
-        ]
+        ],
     }
 }
 
@@ -170,10 +179,9 @@ fn test_input() -> Day11State<'static> {
                 false_test_target: 1,
                 inspect_count: 0,
             },
-        ]
+        ],
     }
 }
-
 
 #[allow(dead_code)]
 pub fn day_11() {
@@ -186,7 +194,8 @@ pub fn day_11() {
         for _ in 0..20 {
             state.perform_round_div3();
         }
-        let monkey_inspects = state.monkey_programs
+        let monkey_inspects = state
+            .monkey_programs
             .iter()
             .map(|mp| mp.inspect_count)
             .sorted_by(|a, b| b.cmp(a))
@@ -200,7 +209,8 @@ pub fn day_11() {
         for _ in 0..10_000 {
             state.perform_round_unlimited();
         }
-        let monkey_inspects = state.monkey_programs
+        let monkey_inspects = state
+            .monkey_programs
             .iter()
             .map(|mp| mp.inspect_count)
             .sorted_by(|a, b| b.cmp(a))

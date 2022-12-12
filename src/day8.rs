@@ -1,7 +1,6 @@
 use std::cmp::max;
 use std::fs;
 
-
 fn read_input() -> Vec<Vec<u8>> {
     let file_contents = fs::read_to_string("day8_puzzle.txt").expect("Unable to read file");
     let mut result = vec![Vec::new()];
@@ -23,7 +22,10 @@ enum Rotation {
     D270,
 }
 
-fn rotate_tree_grid<T: Default + Clone>(tree_grid: &Vec<Vec<T>>, rotation: Rotation) -> Vec<Vec<T>> {
+fn rotate_tree_grid<T: Default + Clone>(
+    tree_grid: &Vec<Vec<T>>,
+    rotation: Rotation,
+) -> Vec<Vec<T>> {
     let n = tree_grid.len();
     let mut result = vec![vec![T::default(); n]; n];
     for r in 0..n {
@@ -32,7 +34,7 @@ fn rotate_tree_grid<T: Default + Clone>(tree_grid: &Vec<Vec<T>>, rotation: Rotat
                 Rotation::D0 => (r, c),
                 Rotation::D90 => (c, n - 1 - r),
                 Rotation::D180 => (n - 1 - r, n - 1 - c),
-                Rotation::D270 => (n - 1 - c, r)
+                Rotation::D270 => (n - 1 - c, r),
             };
             result[new_r][new_c] = tree_grid[r][c].clone();
         }
@@ -40,14 +42,24 @@ fn rotate_tree_grid<T: Default + Clone>(tree_grid: &Vec<Vec<T>>, rotation: Rotat
     result
 }
 
-fn perform_grid_op_4directional<T: Default + Clone, R: Default + Clone>(tree_grid: &Vec<Vec<T>>, f: &dyn Fn(&Vec<Vec<T>>) -> Vec<Vec<R>>)
-                                                                        -> (Vec<Vec<R>>, Vec<Vec<R>>, Vec<Vec<R>>, Vec<Vec<R>>)
-{
+fn perform_grid_op_4directional<T: Default + Clone, R: Default + Clone>(
+    tree_grid: &Vec<Vec<T>>,
+    f: &dyn Fn(&Vec<Vec<T>>) -> Vec<Vec<R>>,
+) -> (Vec<Vec<R>>, Vec<Vec<R>>, Vec<Vec<R>>, Vec<Vec<R>>) {
     (
         rotate_tree_grid(&f(&rotate_tree_grid(tree_grid, Rotation::D0)), Rotation::D0),
-        rotate_tree_grid(&f(&rotate_tree_grid(tree_grid, Rotation::D90)), Rotation::D270),
-        rotate_tree_grid(&f(&rotate_tree_grid(tree_grid, Rotation::D180)), Rotation::D180),
-        rotate_tree_grid(&f(&rotate_tree_grid(tree_grid, Rotation::D270)), Rotation::D90),
+        rotate_tree_grid(
+            &f(&rotate_tree_grid(tree_grid, Rotation::D90)),
+            Rotation::D270,
+        ),
+        rotate_tree_grid(
+            &f(&rotate_tree_grid(tree_grid, Rotation::D180)),
+            Rotation::D180,
+        ),
+        rotate_tree_grid(
+            &f(&rotate_tree_grid(tree_grid, Rotation::D270)),
+            Rotation::D90,
+        ),
     )
 }
 
@@ -69,13 +81,16 @@ fn count_visible_trees(tree_grid: &Vec<Vec<u8>>) -> usize {
         result
     };
 
-    let (visibility_map_left, visibility_map_top, visibility_map_right, visibility_map_down)
-        = perform_grid_op_4directional(&tree_grid, &is_visible_from_left_to_right_map);
+    let (visibility_map_left, visibility_map_top, visibility_map_right, visibility_map_down) =
+        perform_grid_op_4directional(&tree_grid, &is_visible_from_left_to_right_map);
 
     let mut visible_trees = 0;
     for r in 0..n {
         for c in 0..n {
-            let visible = visibility_map_left[r][c] || visibility_map_right[r][c] || visibility_map_top[r][c] || visibility_map_down[r][c];
+            let visible = visibility_map_left[r][c]
+                || visibility_map_right[r][c]
+                || visibility_map_top[r][c]
+                || visibility_map_down[r][c];
             if visible {
                 visible_trees += 1;
             }
@@ -109,13 +124,16 @@ fn compute_scenic_score(tree_grid: &Vec<Vec<u8>>) -> Vec<Vec<u32>> {
         result
     };
 
-    let (view_range_left, view_range_top, view_range_right, view_range_down)
-        = perform_grid_op_4directional(tree_grid, &view_range_from_left_to_right_map);
+    let (view_range_left, view_range_top, view_range_right, view_range_down) =
+        perform_grid_op_4directional(tree_grid, &view_range_from_left_to_right_map);
 
     let mut scenic_score = vec![vec![0; n]; n];
     for r in 0..n {
         for c in 0..n {
-            let score = view_range_left[r][c] * view_range_top[r][c] * view_range_right[r][c] * view_range_down[r][c];
+            let score = view_range_left[r][c]
+                * view_range_top[r][c]
+                * view_range_right[r][c]
+                * view_range_down[r][c];
             scenic_score[r][c] = score;
         }
     }
@@ -133,5 +151,8 @@ pub fn day_8() {
     println!("{:?}", count_visible_trees(&tree_grid));
 
     // star 2
-    println!("{:?}", compute_scenic_score(&tree_grid).iter().flatten().max());
+    println!(
+        "{:?}",
+        compute_scenic_score(&tree_grid).iter().flatten().max()
+    );
 }

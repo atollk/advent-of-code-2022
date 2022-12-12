@@ -1,4 +1,3 @@
-
 use std::fs;
 
 #[allow(dead_code)]
@@ -16,10 +15,16 @@ pub fn day_1() {
         }
     }
 
-    let mut elf_food_sum = elf_food.iter().map(|xs| xs.iter().sum::<i32>()).collect::<Vec<i32>>();
+    let mut elf_food_sum = elf_food
+        .iter()
+        .map(|xs| xs.iter().sum::<i32>())
+        .collect::<Vec<i32>>();
     elf_food_sum.sort();
 
     println!("{:?}", elf_food_sum);
     println!("star1: {:?}", elf_food_sum.iter().max());
-    println!("star2: {:?}", elf_food_sum.iter().rev().take(3).sum::<i32>());
+    println!(
+        "star2: {:?}",
+        elf_food_sum.iter().rev().take(3).sum::<i32>()
+    );
 }

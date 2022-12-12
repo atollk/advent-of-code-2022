@@ -1,6 +1,6 @@
-use std::fs;
 use itertools::Itertools;
 use regex::Regex;
+use std::fs;
 
 #[derive(Debug)]
 struct Day5Input {
@@ -48,7 +48,10 @@ impl Day5Input {
                 .collect::<Vec<_>>()
         };
 
-        Day5Input { initial_stacks: Stacks(initial_stacks), move_list }
+        Day5Input {
+            initial_stacks: Stacks(initial_stacks),
+            move_list,
+        }
     }
 }
 
@@ -65,7 +68,9 @@ impl Stacks {
 
     fn apply_move_9001(&mut self, stack_move: &StackMove) {
         let from_stack = &mut self.0[stack_move.from - 1];
-        let mut moved_elements = from_stack.drain(from_stack.len() - stack_move.crates..).collect_vec();
+        let mut moved_elements = from_stack
+            .drain(from_stack.len() - stack_move.crates..)
+            .collect_vec();
         self.0[stack_move.to - 1].append(&mut moved_elements);
     }
 }

@@ -1,6 +1,6 @@
+use itertools::Itertools;
 use std::collections::HashMap;
 use std::fs;
-use itertools::Itertools;
 
 #[derive(Debug)]
 struct FileTree {
@@ -19,28 +19,27 @@ impl FileCommand {
         let mut commands = Vec::new();
         let mut iter = lines.iter().peekable();
         loop {
-            let next_command =
-                if let Some(line) = iter.next() {
-                    if line.starts_with("$ cd") {
-                        let path = line.chars().dropping(5).as_str();
-                        FileCommand::Cd(path.to_string())
-                    } else {
-                        let mut output_lines = Vec::new();
-                        while let Some(i) = iter.next_if(|line| !line.starts_with("$")) {
-                            output_lines.push(*i);
-                        }
-                        let output = output_lines
-                            .into_iter()
-                            .map(|line| {
-                                let (size, name) = line.split_once(" ").unwrap();
-                                (size.parse().ok(), name.to_string())
-                            })
-                            .collect_vec();
-                        FileCommand::Ls(output)
-                    }
+            let next_command = if let Some(line) = iter.next() {
+                if line.starts_with("$ cd") {
+                    let path = line.chars().dropping(5).as_str();
+                    FileCommand::Cd(path.to_string())
                 } else {
-                    break;
-                };
+                    let mut output_lines = Vec::new();
+                    while let Some(i) = iter.next_if(|line| !line.starts_with("$")) {
+                        output_lines.push(*i);
+                    }
+                    let output = output_lines
+                        .into_iter()
+                        .map(|line| {
+                            let (size, name) = line.split_once(" ").unwrap();
+                            (size.parse().ok(), name.to_string())
+                        })
+                        .collect_vec();
+                    FileCommand::Ls(output)
+                }
+            } else {
+                break;
+            };
             commands.push(next_command);
         }
         commands
@@ -49,7 +48,11 @@ impl FileCommand {
 
 impl FileTree {
     fn size(&self) -> usize {
-        let children_sizes = self.children.values().map(|subtree| subtree.size()).sum::<usize>();
+        let children_sizes = self
+            .children
+            .values()
+            .map(|subtree| subtree.size())
+            .sum::<usize>();
         children_sizes + self.root_size.unwrap_or(0)
     }
 
@@ -58,7 +61,10 @@ impl FileTree {
     }
 
     fn from_input(file_contents: &str) -> FileTree {
-        let lines = file_contents.split("\n").filter(|line| !line.is_empty()).collect_vec();
+        let lines = file_contents
+            .split("\n")
+            .filter(|line| !line.is_empty())
+            .collect_vec();
 
         let commands = FileCommand::parse_commands(&lines);
 
@@ -66,21 +72,22 @@ impl FileTree {
     }
 
     fn from_commands(commands: &[FileCommand]) -> FileTree {
-        let mut tree = FileTree { root_size: None, children: HashMap::new() };
+        let mut tree = FileTree {
+            root_size: None,
+            children: HashMap::new(),
+        };
         let mut current_path = Vec::new();
 
         for command in commands {
             match command {
-                FileCommand::Cd(path) => {
-                    match path.as_str() {
-                        "/" => current_path = Vec::new(),
-                        ".." => {
-                            current_path.pop();
-                            ()
-                        }
-                        _ => current_path.push(path)
+                FileCommand::Cd(path) => match path.as_str() {
+                    "/" => current_path = Vec::new(),
+                    ".." => {
+                        current_path.pop();
+                        ()
                     }
-                }
+                    _ => current_path.push(path),
+                },
                 FileCommand::Ls(children) => {
                     let mut subtree = &mut tree;
                     for &p in current_path.iter() {
@@ -88,7 +95,13 @@ impl FileTree {
                     }
                     for child in children {
                         if !subtree.children.contains_key(&child.1) {
-                            subtree.children.insert(child.1.clone(), FileTree { root_size: child.0, children: HashMap::new() });
+                            subtree.children.insert(
+                                child.1.clone(),
+                                FileTree {
+                                    root_size: child.0,
+                                    children: HashMap::new(),
+                                },
+                            );
                         }
                     }
                 }
@@ -139,10 +152,16 @@ pub fn day_7() {
         let required_free_space = TOTAL_REQUIRED_SPACE - (TOTAL_SPACE - best_size);
         for subtree in file_tree.recursive_walk() {
             let subtree_size = subtree.size();
-            if subtree.root_size.is_none() && subtree_size >= required_free_space && subtree_size < best_size {
+            if subtree.root_size.is_none()
+                && subtree_size >= required_free_space
+                && subtree_size < best_size
+            {
                 best_size = subtree_size;
             }
         }
-        println!("free space needed: {:?}, solution: {:?}", required_free_space, best_size);
+        println!(
+            "free space needed: {:?}, solution: {:?}",
+            required_free_space, best_size
+        );
     }
 }
